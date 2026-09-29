@@ -1,5 +1,6 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
@@ -11,16 +12,17 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
-    <>
-      <StatusBar style="light" />
+    <SafeAreaProvider>
+      <StatusBar style="dark" />
       <NavigationContainer>
         <Stack.Navigator
           initialRouteName="Home"
           screenOptions={{
-            headerStyle: { backgroundColor: '#12121a' },
-            headerTintColor: '#ffffff',
-            headerTitleStyle: { fontWeight: '700' },
-            contentStyle: { backgroundColor: '#12121a' },
+            headerStyle: { backgroundColor: '#FAF6EE' },
+            headerShadowVisible: false,
+            headerTintColor: '#231F18',
+            headerTitleStyle: { fontWeight: '800', letterSpacing: -0.2 },
+            contentStyle: { backgroundColor: '#FAF6EE' },
           }}
         >
           <Stack.Screen
@@ -40,6 +42,6 @@ export default function App() {
           />
         </Stack.Navigator>
       </NavigationContainer>
-    </>
+    </SafeAreaProvider>
   );
 }

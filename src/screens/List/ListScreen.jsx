@@ -8,8 +8,8 @@ import {
   Pressable,
   ActivityIndicator,
   TextInput,
-  SafeAreaView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { getTrending, searchTemplates } from '../../api/api';
 
 export default function ListScreen({ navigation }) {
@@ -68,13 +68,21 @@ export default function ListScreen({ navigation }) {
             {item.name}
           </Text>
           <Text style={styles.cardId} numberOfLines={1}>
-            ID: {item.id}
+            #{item.id}
           </Text>
-          <Text style={styles.cardCategories} numberOfLines={1}>
-            {item.categories && item.categories.length > 0
-              ? item.categories.join(', ')
-              : 'Sem categoria'}
-          </Text>
+          {item.categories && item.categories.length > 0 ? (
+            <View style={styles.cardChipRow}>
+              {item.categories.slice(0, 2).map((cat) => (
+                <View key={cat} style={styles.cardChip}>
+                  <Text style={styles.cardChipText} numberOfLines={1}>
+                    {cat}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          ) : (
+            <Text style={styles.cardCategories}>Sem categoria</Text>
+          )}
         </View>
       </Pressable>
     );
@@ -89,7 +97,7 @@ export default function ListScreen({ navigation }) {
       <TextInput
         style={styles.search}
         placeholder="Buscar template (ex: drake)"
-        placeholderTextColor="#7a7a8c"
+        placeholderTextColor="#A79D89"
         value={query}
         onChangeText={handleSearch}
         autoCapitalize="none"
@@ -97,7 +105,7 @@ export default function ListScreen({ navigation }) {
 
       {loading && (
         <View style={styles.center}>
-          <ActivityIndicator size="large" color="#7c5cff" />
+          <ActivityIndicator size="large" color="#D9542B" />
         </View>
       )}
 
@@ -128,42 +136,47 @@ export default function ListScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#12121a',
+    backgroundColor: '#FAF6EE',
     paddingHorizontal: 16,
   },
   heading: {
     fontSize: 22,
-    fontWeight: '700',
-    color: '#ffffff',
+    fontWeight: '800',
+    color: '#231F18',
     marginTop: 12,
     marginBottom: 12,
+    letterSpacing: -0.3,
   },
   search: {
-    backgroundColor: '#1e1e2a',
-    color: '#ffffff',
-    borderRadius: 10,
+    backgroundColor: '#FFFFFF',
+    color: '#231F18',
+    borderRadius: 12,
     paddingHorizontal: 14,
-    paddingVertical: 10,
-    marginBottom: 12,
+    paddingVertical: 12,
+    marginBottom: 14,
     fontSize: 15,
+    borderWidth: 1,
+    borderColor: '#E7DFCE',
   },
   list: {
     paddingBottom: 24,
   },
   card: {
     flexDirection: 'row',
-    backgroundColor: '#1e1e2a',
-    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
     marginBottom: 10,
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#E7DFCE',
   },
   cardPressed: {
     opacity: 0.7,
   },
   thumb: {
-    width: 80,
-    height: 80,
-    backgroundColor: '#2a2a3a',
+    width: 84,
+    height: 84,
+    backgroundColor: '#F3ECDC',
   },
   cardInfo: {
     flex: 1,
@@ -171,19 +184,35 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   cardTitle: {
-    color: '#ffffff',
+    color: '#231F18',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   cardId: {
-    color: '#8a8a9e',
-    fontSize: 12,
+    color: '#A79D89',
+    fontSize: 11,
     marginTop: 2,
   },
   cardCategories: {
-    color: '#7c5cff',
+    color: '#726B5C',
     fontSize: 12,
-    marginTop: 4,
+    marginTop: 6,
+  },
+  cardChipRow: {
+    flexDirection: 'row',
+    marginTop: 6,
+  },
+  cardChip: {
+    backgroundColor: '#F2D9C8',
+    borderRadius: 999,
+    paddingVertical: 3,
+    paddingHorizontal: 9,
+    marginRight: 6,
+  },
+  cardChipText: {
+    color: '#D9542B',
+    fontSize: 10,
+    fontWeight: '700',
   },
   center: {
     flex: 1,
@@ -191,22 +220,22 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   error: {
-    color: '#ff6b6b',
+    color: '#B23B2E',
     marginBottom: 12,
     textAlign: 'center',
   },
   retryButton: {
-    backgroundColor: '#7c5cff',
+    backgroundColor: '#231F18',
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 999,
+    borderRadius: 10,
   },
   retryText: {
-    color: '#ffffff',
-    fontWeight: '600',
+    color: '#FAF6EE',
+    fontWeight: '700',
   },
   empty: {
-    color: '#7a7a8c',
+    color: '#A79D89',
     textAlign: 'center',
     marginTop: 40,
   },
