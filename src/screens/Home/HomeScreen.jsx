@@ -4,24 +4,30 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen({ navigation }) {
   return (
+    // safeareaview para evitar que o conteúdo fique debaixo do topo do celular
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
+        {/* selinho decorativo do topo */}
         <View style={styles.badge}>
           <Text style={styles.badgeText}>😂 MEME EXPLORER</Text>
         </View>
 
+        {/* título principal com quebras de linha para estilização */}
         <Text style={styles.title}>
           os melhores{'\n'}templates, num{'\n'}só lugar.
         </Text>
 
+        {/* linha alaranjada de separação estilosa */}
         <View style={styles.divider} />
 
+        {/* texto explicativo sobre o propósito do aplicativo */}
         <Text style={styles.subtitle}>
           descubra aqui os templates de memes internacionais mais populares do momento, pesquise
           por nome e veja o contexto de cada um — direto da API pública
           justmeme.wtf.
         </Text>
 
+        {/* botão de navegação acionando a ida para a tela 'List' */}
         <Pressable
           style={({ pressed }) => [
             styles.button,
@@ -34,6 +40,7 @@ export default function HomeScreen({ navigation }) {
         </Pressable>
       </View>
 
+      {/* rodapé discreto com os créditos da api */}
       <Text style={styles.footer}>dados fornecidos por justmeme.wtf</Text>
     </SafeAreaView>
   );

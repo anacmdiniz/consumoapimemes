@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -13,12 +13,17 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { getTrending, searchTemplates } from '../../api/api';
 
 export default function ListScreen({ navigation }) {
+  // estados locais para guardar memes, estado de carregamento, erros e o texto da busca
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [query, setQuery] = useState('');
   const [searching, setSearching] = useState(false);
 
+  // guarda o timer do debounce para conseguir cancelar quando o usuário continua digitando
+  const debounceRef = useRef(null);
+
+  // função memorizada que carrega os memes em alta ao abrir a tela
   const loadTrending = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -32,22 +37,25 @@ export default function ListScreen({ navigation }) {
     }
   }, []);
 
+  // dispara a busca inicial assim que o componente carrega na tela
   useEffect(() => {
     loadTrending();
   }, [loadTrending]);
 
-  async function handleSearch(text) {
-    setQuery(text);
-    if (!text.trim()) {
-      setSearching(false);
-      loadTrending();
-      return;
-    }
+  // limpa o timer pendente caso a tela seja fechada no meio da digitação
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, []);
+
+  // faz de fato a consulta na api com o termo já validado
+  async function runSearch(term) {
     setSearching(true);
     setLoading(true);
     setError(null);
     try {
-      const results = await searchTemplates(text.trim());
+      const results = await searchTemplates(term);
       setTemplates(results);
     } catch (err) {
       setError(err.message);
@@ -56,6 +64,45 @@ export default function ListScreen({ navigation }) {
     }
   }
 
+  // lida com a digitação do usuário, esperando ele parar de digitar antes de buscar
+  function handleSearch(text) {
+    setQuery(text);
+    const term = text.trim();
+
+    // cancela a busca anterior que ainda estava esperando o tempo passar
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    // campo vazio: volta para os memes em alta
+    if (!term) {
+      setSearching(false);
+      loadTrending();
+      return;
+    }
+
+    // a api exige no mínimo 2 caracteres, então só esperamos o usuário digitar mais
+    if (term.length < 2) {
+      setError(null);
+      return;
+    }
+
+    // só dispara a busca depois de 400ms sem digitar nada novo
+    debounceRef.current = setTimeout(() => {
+      runSearch(term);
+    }, 400);
+  }
+
+  // o botão de tentar novamente repete a ação certa: busca ou memes em alta
+  function handleRetry() {
+    const term = query.trim();
+    if (term.length >= 2) {
+      runSearch(term);
+    } else {
+      setSearching(false);
+      loadTrending();
+    }
+  }
+
+  // renderiza cada item individual da lista em formato de cartão clicável
   function renderItem({ item }) {
     return (
       <Pressable
@@ -94,6 +141,7 @@ export default function ListScreen({ navigation }) {
         {searching ? 'Resultados da busca' : 'Memes em alta'}
       </Text>
 
+      {/* campo de entrada de texto para filtrar templates */}
       <TextInput
         style={styles.search}
         placeholder="Buscar template (ex: drake)"
@@ -103,27 +151,31 @@ export default function ListScreen({ navigation }) {
         autoCapitalize="none"
       />
 
+      {/* exibe a bolinha de carregamento enquanto busca dados da api */}
       {loading && (
         <View style={styles.center}>
           <ActivityIndicator size="large" color="#D9542B" />
         </View>
       )}
 
+      {/* exibição amigável caso aconteça um erro de conexão */}
       {!loading && error && (
         <View style={styles.center}>
           <Text style={styles.error}>Erro: {error}</Text>
-          <Pressable onPress={loadTrending} style={styles.retryButton}>
+          <Pressable onPress={handleRetry} style={styles.retryButton}>
             <Text style={styles.retryText}>Tentar novamente</Text>
           </Pressable>
         </View>
       )}
 
+      {/* exibe a lista otimizada com flatlist caso esteja tudo ok */}
       {!loading && !error && (
         <FlatList
           data={templates}
           keyExtractor={(item) => item.id || item.slug}
           renderItem={renderItem}
           contentContainerStyle={styles.list}
+          keyboardShouldPersistTaps="handled"
           ListEmptyComponent={
             <Text style={styles.empty}>Nenhum template encontrado.</Text>
           }

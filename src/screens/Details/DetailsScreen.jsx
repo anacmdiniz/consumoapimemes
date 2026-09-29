@@ -10,9 +10,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getTemplateBySlug } from '../../api/api';
 
-// --- Descrições conhecidas -------------------------------------------------
-// Base de templates famosos, usada para dar contexto real (origem/uso) quando
-// o meme retornado pela API bate com algum desses formatos clássicos.
+// base de conhecimento com explicações históricas dos memes clássicos
 const KNOWN_TEMPLATES = [
   {
     keywords: ['drake'],
@@ -128,6 +126,7 @@ const KNOWN_TEMPLATES = [
   },
 ];
 
+// limpa e normaliza os textos para facilitar a comparação sem acentos ou caracteres especiais
 function normalize(str = '') {
   return str
     .toLowerCase()
@@ -137,6 +136,7 @@ function normalize(str = '') {
     .trim();
 }
 
+// dicionário para dar contexto dinâmico às categorias encontradas
 const CATEGORY_FLAVORS = {
   reaction: 'costuma aparecer em respostas rápidas, para expressar surpresa, ironia ou deboche',
   reactions: 'costuma aparecer em respostas rápidas, para expressar surpresa, ironia ou deboche',
@@ -145,10 +145,11 @@ const CATEGORY_FLAVORS = {
   cartoon: 'vem de um desenho animado e acabou virando um formato reaproveitado à exaustão',
   politics: 'circula bastante em discussões e piadas sobre política e atualidades',
   gaming: 'nasceu dentro da cultura dos jogos e é usado por jogadores em situações do dia a dia',
-  wholesome: 'é usado em contextos mais leves e positivos, sem a ironia pesada de outros formatos',
+  wholesome: 'é usado em contexts mais leves e positivos, sem a ironia pesada de outros formatos',
   sad: 'costuma acompanhar piadas autodepreciativas ou sobre pequenas decepções do cotidiano',
 };
 
+// constrói uma descrição alternativa inteligente caso o meme não esteja na nossa lista manual
 function buildFallbackDescription(name, categories) {
   const catList = Array.isArray(categories) ? categories : [];
   const matchedFlavor = catList
@@ -164,6 +165,7 @@ function buildFallbackDescription(name, categories) {
   return `"${name}" é um dos formatos que passam de mão em mão pela internet, remixado por diferentes comunidades. ${catText} A origem exata não está documentada por aqui — mas é isso que dá liberdade para reinventar o formato.`;
 }
 
+// escolhe a melhor explicação para o meme selecionado
 function getDescription(template) {
   if (!template) return '';
   const normalizedName = normalize(template.name || template.slug || '');
@@ -175,11 +177,13 @@ function getDescription(template) {
 }
 
 export default function DetailsScreen({ route }) {
+  // recebe a chave 'slug' enviada pela rota de navegação
   const { slug } = route.params;
   const [template, setTemplate] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // faz a busca dos detalhes específicos deste meme ao abrir a tela
   useEffect(() => {
     let mounted = true;
     async function load() {
@@ -200,6 +204,7 @@ export default function DetailsScreen({ route }) {
     };
   }, [slug]);
 
+  // memoriza o texto de descrição para não reprocessar a cada renderização
   const description = useMemo(() => getDescription(template), [template]);
 
   if (loading) {
@@ -224,12 +229,15 @@ export default function DetailsScreen({ route }) {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
+        {/* imagem do meme em destaque */}
         <View style={styles.imageWrap}>
           <Image source={{ uri: template.url }} style={styles.image} />
         </View>
 
+        {/* título do meme */}
         <Text style={styles.title}>{template.name}</Text>
 
+        {/* chips de categorias */}
         {categories.length > 0 && (
           <View style={styles.chipRow}>
             {categories.map((cat) => (
@@ -240,11 +248,13 @@ export default function DetailsScreen({ route }) {
           </View>
         )}
 
+        {/* cartão com a história / contexto do meme */}
         <View style={styles.descCard}>
           <Text style={styles.descLabel}>SOBRE ESSE TEMPLATE</Text>
           <Text style={styles.descText}>{description}</Text>
         </View>
 
+        {/* cartão técnico com metadados recebidos da api */}
         <View style={styles.infoCard}>
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>ID</Text>
