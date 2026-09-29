@@ -36,9 +36,12 @@ esta aplicação foi desenvolvida como parte da atividade prática individual de
 - aplicativo **expo go** no emulador android studio
 
 
-### prints das telas funcionando
+## 📸 prints das telas funcionando
 
-[tela Home](./assets/telaHome.png)
-[tela Lista](./assets/telaLista.png)
-[tela Detalhes](./assets/telaDetalhes.png)
-[tela de resultados da busca](./assets/resultadosBusca.png)
+<div align="center">
+
+| tela Home | tela Lista | tela Detalhes | tela de resultados da busca |
+| :---: | :---: | :---: | :---: |
+| <img src="./assets/telaHome.png" width="180" /> | <img src="./assets/telaLista.png" width="180" /> | <img src="./assets/telaDetalhes.png" width="180" /> | <img src="./assets/resultadosBusca.png" width="180" /> |
+
+</div>
